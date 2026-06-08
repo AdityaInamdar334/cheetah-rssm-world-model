@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheetah RSSM - Robotic World Model Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --card-bg: rgba(15, 23, 42, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-cyan: #00f5d4;
+            --accent-blue: #00bbf9;
+            --accent-purple: #9b5de5;
+            --accent-red: #ff0054;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'Source Code Pro', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 187, 249, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(155, 93, 229, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Container & Grid layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn Down 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: -0.03em;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 187, 249, 0.3);
+        }
+
+        .stat-val {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Tabs Nav */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: var(--text-primary);
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(155, 93, 229, 0.3);
+        }
+
+        /* Tab Contents */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Interactive Simulator Card Layout */
+        .sim-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 35px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 30px;
+        }
+
+        .frame-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .frame-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .frame-card {
+            background: rgba(8, 12, 20, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .frame-card.dreaming {
+            border-color: rgba(255, 0, 84, 0.2);
+        }
+
+        .frame-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .frame-card img {
+            width: 100%;
+            max-width: 256px;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            image-rendering: pixelated;
+            background: #000;
+        }
+
+        /* Control elements */
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .slider-wrapper {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-label {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            min-width: 110px;
+            text-align: center;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            transition: transform 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .play-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 10px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: var(--font-main);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .play-btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(0, 245, 212, 0.4);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+        }
+
+        .badge-context {
+            background: rgba(0, 245, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 245, 212, 0.3);
+        }
+
+        .badge-dream {
+            background: rgba(255, 0, 84, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 0, 84, 0.3);
+        }
+
+        /* Diagnostics View */
+        .diag-wrapper {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .diag-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .diag-chart-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .diag-chart-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .diag-info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            backdrop-filter: blur(12px);
+        }
+
+        .diag-info-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 10px;
+            color: var(--accent-cyan);
+        }
+
+        .diag-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .diag-list li {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .diag-list strong {
+            color: var(--text-primary);
+        }
+
+        /* Architecture View */
+        .arch-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(12px);
+            text-align: center;
+        }
+
+        .arch-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .flow-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .flow-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        .box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px 25px;
+            min-width: 180px;
+            transition: all 0.3s ease;
+        }
+
+        .box:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(0, 187, 249, 0.2);
+        }
+
+        .box.cyan { border-color: var(--accent-cyan); }
+        .box.purple { border-color: var(--accent-purple); }
+        .box.red { border-color: var(--accent-red); }
+
+        .box-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .box-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .arrow-down {
+            width: 2px;
+            height: 30px;
+            background: linear-gradient(to bottom, var(--accent-blue), var(--accent-purple));
+        }
+
+        .arrow-right {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Footer styling */
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--card-border);
+            padding-top: 30px;
+        }
+
+        footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: var(--accent-cyan);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>RSSM: Dreaming Cheetah</h1>
+            <p>A Recurrent State Space Model trained on Apple Silicon MPS visual observations to learn visual dynamics open-loop.</p>
+        </header>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val">27.4x</div>
+                <div class="stat-label">GPU Acceleration Speedup</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">100,000</div>
+                <div class="stat-label">Dynamics Training Steps</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">5.02 M</div>
+                <div class="stat-label">Model Parameters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">Apple MPS</div>
+                <div class="stat-label">Hardware Platform</div>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('sim')">Dreaming Simulator</button>
+            <button class="tab-btn" onclick="switchTab('diag')">Diagnostics & Loss</button>
+            <button class="tab-btn" onclick="switchTab('arch')">Model Architecture</button>
+        </div>
+
+        <!-- Tab 1: Simulator (Active) -->
+        <div id="tab-sim" class="tab-content active">
+            <div class="sim-card">
+                <div class="frame-grid">
+                    <!-- Column 1: Ground Truth -->
+                    <div class="frame-card">
+                        <h3>Ground Truth</h3>
+                        <img id="img-gt" src="assets/gt_0.png" alt="Ground Truth">
+                    </div>
+                    <!-- Column 2: Reconstruction -->
+                    <div class="frame-card">
+                        <h3>Reconstruction</h3>
+                        <img id="img-recon" src="assets/recon_0.png" alt="Reconstruction">
+                    </div>
+                    <!-- Column 3: Predicted / Dreaming -->
+                    <div class="frame-card dreaming" id="card-pred">
+                        <h3>Open-Loop Prediction</h3>
+                        <img id="img-pred" src="assets/pred_0.png" alt="Dreaming">
+                    </div>
+                </div>
+
+                <!-- Simulation Controls -->
+                <div class="controls-container">
+                    <div class="slider-wrapper">
+                        <button class="play-btn" id="btn-play" onclick="togglePlay()">
+                            <span id="play-icon">▶</span> <span id="play-text">Auto Play</span>
+                        </button>
+                        <input type="range" id="time-slider" min="0" max="39" value="0" oninput="updateFrames(this.value)">
+                        <div class="slider-label" id="slider-val">Step: 0 / 40</div>
+                    </div>
+                    <div id="status-badge-container">
+                        <span class="status-badge badge-context" id="sim-badge">Context Phase</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Diagnostics -->
+        <div id="tab-diag" class="tab-content">
+            <div class="diag-wrapper">
+                <!-- Matplotlib plot image -->
+                <div class="diag-chart-card">
+                    <img src="diagnostics.png" alt="RSSM Training Diagnostics">
+                </div>
+                <!-- Text descriptions -->
+                <div class="diag-info-card">
+                    <h3>Dynamics Validation Metrics</h3>
+                    <ul class="diag-list">
+                        <li>
+                            <strong>Reconstruction MSE: 0.000640</strong><br>
+                            During the first 10 steps (Context phase), the model uses real pixel observations to form posterior distributions, giving high-fidelity reconstructions.
+                        </li>
+                        <li>
+                            <strong>Prediction MSE: 0.000670</strong><br>
+                            In the open-loop dreaming phase (steps 10 to 40), the model predicts future visual dynamics entirely using transition priors. The error remains low, showing high recurrent stability.
+                        </li>
+                        <li>
+                            <strong>Reward Prediction</strong><br>
+                            The reward predictor accurately maps the latent states $(h_t, s_t)$ to environmental rewards, capturing the peaks and valleys of running speed even when dreaming.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Model Architecture -->
+        <div id="tab-arch" class="tab-content">
+            <div class="arch-card">
+                <h2>RSSM Cell Information Flow</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 30px;">How information flows dynamically at each sequence step in the World Model.</p>
+                <div class="arch-diagram">
+                    <!-- Row 1: Observation Input -->
+                    <div class="flow-row">
+                        <div class="box cyan">
+                            <div class="box-title">Observation (x_t)</div>
+                            <div class="box-desc">64x64x3 RGB image</div>
+                        </div>
+                        <div class="arrow-right">➔</div>
+                        <div class="box cyan">
+                            <div class="box-title">CNN Encoder</div>
+                            <div class="box-desc">Converts image to 1024-dim</div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down"></div>
+
+                    <!-- Row 2: RSSM Transition State Update -->
+                    <div class="flow-row">
+                        <div class="box purple">
+                            <div class="box-title">GRU Cell</div>
+                            <div class="box-desc">h_t = GRU(h_t-1, s_t-1, a_t-1)</div>
+                        </div>
+                        <div class="arrow-right">➔</div>
+                        <div class="box purple">
+                            <div class="box-title">Stochastic Post (q)</div>
+                            <div class="box-desc">s_t ~ Posterior(h_t, embed_t)</div>
+                        </div>
+                        <div class="arrow-right">➔</div>
+                        <div class="box purple">
+                            <div class="box-title">Stochastic Prior (p)</div>
+                            <div class="box-desc">s_t ~ Prior(h_t) (Dreaming)</div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down"></div>
+
+                    <!-- Row 3: Reconstruction Outputs -->
+                    <div class="flow-row">
+                        <div class="box red">
+                            <div class="box-title">CNN Decoder</div>
+                            <div class="box-desc">Reconstructs image from (h_t, s_t)</div>
+                        </div>
+                        <div class="arrow-right">➔</div>
+                        <div class="box red">
+                            <div class="box-title">Reward Predictor</div>
+                            <div class="box-desc">Predicts task reward from (h_t, s_t)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Project workspace files: <a href="collect_data.py">collect_data.py</a> | <a href="world_model.py">world_model.py</a> | <a href="train.py">train.py</a> | <a href="utils.py">utils.py</a></p>
+            <p style="margin-top: 10px; opacity: 0.6;">© 2026 DeepMind Control Suite Cheetah Run World Model Project.</p>
+        </footer>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        // Tab switching logic
+        function switchTab(tabName) {
+            // Deactivate all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Activate target tab
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.innerText.toLowerCase().includes(tabName));
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            const activeContent = document.getElementById(`tab-${tabName}`);
+            if (activeContent) activeContent.classList.add('active');
+        }
+
+        // Frame slider logic
+        function updateFrames(val) {
+            val = parseInt(val);
+            document.getElementById('time-slider').value = val;
+            document.getElementById('slider-val').innerText = `Step: ${val} / 40`;
+
+            // Update images
+            document.getElementById('img-gt').src = `assets/gt_${val}.png`;
+            document.getElementById('img-recon').src = `assets/recon_${val}.png`;
+            document.getElementById('img-pred').src = `assets/pred_${val}.png`;
+
+            // Update context/dream status badge
+            const badge = document.getElementById('sim-badge');
+            const cardPred = document.getElementById('card-pred');
+            
+            if (val < 10) {
+                badge.innerText = "Context Phase";
+                badge.className = "status-badge badge-context";
+                cardPred.style.borderColor = "var(--card-border)";
+            } else {
+                badge.innerText = `Open-Loop Dreaming (+${val - 10})`;
+                badge.className = "status-badge badge-dream";
+                cardPred.style.borderColor = "rgba(255, 0, 84, 0.4)";
+            }
+        }
+
+        // Auto play looping logic
+        let playInterval = null;
+        function togglePlay() {
+            const btnText = document.getElementById('play-text');
+            const btnIcon = document.getElementById('play-icon');
+            const slider = document.getElementById('time-slider');
+
+            if (playInterval) {
+                // Pause
+                clearInterval(playInterval);
+                playInterval = null;
+                btnText.innerText = "Auto Play";
+                btnIcon.innerText = "▶";
+            } else {
+                // Play
+                btnText.innerText = "Pause";
+                btnIcon.innerText = "⏸";
+                playInterval = setInterval(() => {
+                    let nextVal = (parseInt(slider.value) + 1) % 40;
+                    updateFrames(nextVal);
+                }, 180); // 180ms delay matches the visual animation pacing
+            }
+        }
+    </script>
+</body>
+</html>

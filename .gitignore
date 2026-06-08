@@ -1,0 +1,14 @@
+# Virtual Environment & Cache
+venv/
+__pycache__/
+.DS_Store
+
+# Large datasets and models
+*.pkl
+checkpoints/
+*.pt
+
+# Web assets we generated (optional, but good to keep for the site)
+# We can keep web/assets/ if we want the GitHub Pages site to work immediately!
+# Yes, web/assets/ contains the frames, which are very small PNG files (6KB each), total 700KB.
+# So we do NOT ignore web/assets/! That way GitHub Pages works automatically!

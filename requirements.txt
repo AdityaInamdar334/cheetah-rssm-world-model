@@ -1,0 +1,10 @@
+# Requirements for Dreamer-style RSSM data collection and training
+dm_control==1.0.41
+mujoco==3.8.1
+torch
+torchvision
+numpy
+matplotlib
+opencv-python
+tqdm
+pillow
